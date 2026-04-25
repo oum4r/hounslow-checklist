@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hounslow 2154 — Final Day Checklist</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #2A2A30;
+    --muted: #6B6B75;
+    --light: #F4F2EC;
+    --card: #EFECE4;
+    --white: #FCFBF9;
+    --slate: #2C3450;
+    --green: #2F7558;
+    --green-tint: #D6EADD;
+    --red: #A04545;
+    --red-tint: #F2DCDC;
+    --blue: #2A4A95;
+    --blue-tint: #DCE4F2;
+    --amber: #B8860B;
+    --amber-tint: #F5EDD4;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--ink);
+    line-height: 1.55;
+    font-size: 15px;
+    padding-bottom: 100px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Sticky header */
+  .header {
+    background: var(--slate);
+    color: white;
+    padding: 20px 20px 14px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+  .header p { font-size: 13px; opacity: 0.7; margin-top: 2px; }
+  .reset-btn {
+    background: rgba(255,255,255,0.12);
+    border: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+  .reset-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+  .progress-bar {
+    height: 4px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: #6EE7A0;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-text {
+    font-size: 12px;
+    opacity: 0.6;
+    margin-top: 4px;
+    text-align: right;
+  }
+
+  .page { max-width: 640px; margin: 0 auto; padding: 20px 16px; }
+
+  /* Section */
+  .section { margin-bottom: 28px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--light);
+  }
+  .section-icon {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: white;
+    flex-shrink: 0;
+  }
+  .section-header h2 { font-size: 16px; font-weight: 700; color: var(--slate); }
+  .section-header .time {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    white-space: nowrap;
+  }
+
+  /* Checklist items */
+  .item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .item:active { background: var(--light); }
+  .item.checked { opacity: 0.4; }
+  .item.checked .item-text { text-decoration: line-through; }
+  .checkbox {
+    width: 22px; height: 22px;
+    border: 2px solid #C8C4BA;
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .item.checked .checkbox {
+    background: var(--green);
+    border-color: var(--green);
+  }
+  .check-svg { display: none; }
+  .item.checked .check-svg { display: block; }
+  .item-text { flex: 1; font-size: 14.5px; }
+  .item-text strong { font-weight: 600; }
+  .item-sub { font-size: 13px; color: var(--muted); margin-top: 2px; display: block; }
+
+  /* Alert */
+  .alert {
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .alert.red { background: var(--red-tint); color: var(--red); border-left: 3px solid var(--red); }
+  .alert.amber { background: var(--amber-tint); color: var(--amber); border-left: 3px solid var(--amber); }
+  .alert.blue { background: var(--blue-tint); color: var(--blue); border-left: 3px solid var(--blue); }
+  .alert.green { background: var(--green-tint); color: var(--green); border-left: 3px solid var(--green); }
+
+  /* Loading order */
+  .load-order { counter-reset: load; padding: 0; list-style: none; }
+  .load-order li {
+    counter-increment: load;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--light);
+  }
+  .load-order li:last-child { border-bottom: none; }
+  .load-order li::before {
+    content: counter(load);
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--slate);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .load-order .dest {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    white-space: nowrap;
+  }
+
+  /* Count card */
+  .count-card {
+    background: var(--light);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .count-card h3 { font-size: 14px; font-weight: 700; color: var(--slate); margin-bottom: 8px; }
+  .count-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    font-size: 13.5px;
+  }
+  .count-row:last-child { border-bottom: none; }
+  .count-input {
+    width: 56px;
+    text-align: center;
+    border: 1.5px solid #D8D4CC;
+    border-radius: 6px;
+    padding: 4px 6px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--slate);
+    background: white;
+    -webkit-appearance: none;
+  }
+  .count-input:focus { outline: none; border-color: var(--blue); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>Final Day Checklist</h1>
+      <p>Hounslow 2154 · Sat 25 April · Lorry at 4pm</p>
+    </div>
+    <button class="reset-btn" onclick="resetAll()">Reset all</button>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-text" id="progressText">0 / 0</div>
+</div>
+
+<div class="page">
+
+<!-- ========== STOCK ========== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background:var(--red)">1</div>
+    <h2>Stock scanning & packing</h2>
+    <span class="time">First priority</span>
+  </div>
+  <div class="alert red">Stock goes on the lorry first. Everything else loads after.</div>
+
+  <div class="item" data-id="s1" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>DC 7777 — Women's Clothing (~2,230)</strong><span class="item-sub">One scanner. Label: "To DC 7777 from Hounslow 2154 — [Transfer Ref]". Ref on every label. No transfer notes.</span></div>
+  </div>
+  <div class="item" data-id="s2" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>DC 7777 — Footwear (~520)</strong><span class="item-sub">Separate scanner. Same labelling.</span></div>
+  </div>
+  <div class="item" data-id="s3" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>DC 7777 — 915 GC (~440)</strong><span class="item-sub">Separate scanner. Same labelling.</span></div>
+  </div>
+  <div class="item" data-id="s4" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Salisbury 2096 — Accs (~983)</strong><span class="item-sub">Scan per box, submit when full. Mix product types. Notes in envelope, one box.</span></div>
+  </div>
+  <div class="item" data-id="s5" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Bracknell 2211 — Accs (~983)</strong><span class="item-sub">Same as Salisbury. Notes in envelope, one box.</span></div>
+  </div>
+  <div class="item" data-id="s6" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Bracknell 2211 — 915 LNS (~145)</strong><span class="item-sub">Notes in envelope with the Bracknell accs box.</span></div>
+  </div>
+  <div class="item" data-id="s7" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Hemel Hempstead 1958 — Lingerie (~330)</strong><span class="item-sub">Notes in envelope, one box.</span></div>
+  </div>
+  <div class="item" data-id="s8" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Croydon 2099 — ALL sale/markdown (~670)</strong><span class="item-sub">Scan per set/box, submit each. Transfer note on EACH container.</span></div>
+  </div>
+  <div class="item" data-id="s9" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>NL ecomm-only brands</strong><span class="item-sub">Via 7777 but boxed separately.</span></div>
+  </div>
+  <div class="item" data-id="s10" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Uncollected brand stock (BV / Apricot)</strong><span class="item-sub">If not collected, label to Hemel Hempstead.</span></div>
+  </div>
+</div>
+
+<!-- ========== COUNTS ========== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background:var(--amber)">!</div>
+    <h2>Counts for Chris</h2>
+    <span class="time">As you pack</span>
+  </div>
+  <div class="alert amber">Chris needs sets & boxes per destination once loaded. Tally as you go.</div>
+
+  <div class="count-card">
+    <h3>Sets & boxes per destination</h3>
+    <div class="count-row"><span>DC 7777 — hanging sets</span><input class="count-input" data-count="c1" type="number" inputmode="numeric" placeholder="—"></div>
+    <div class="count-row"><span>DC 7777 — boxes</span><input class="count-input" data-count="c2" type="number" inputmode="numeric" placeholder="—"></div>
+    <div class="count-row"><span>Salisbury 2096</span><input class="count-input" data-count="c3" type="number" inputmode="numeric" placeholder="—"></div>
+    <div class="count-row"><span>Bracknell 2211</span><input class="count-input" data-count="c4" type="number" inputmode="numeric" placeholder="—"></div>
+    <div class="count-row"><span>Hemel Hempstead 1958</span><input class="count-input" data-count="c5" type="number" inputmode="numeric" placeholder="—"></div>
+    <div class="count-row"><span>Croydon 2099 — sets</span><input class="count-input" data-count="c6" type="number" inputmode="numeric" placeholder="—"></div>
+    <div class="count-row"><span>Croydon 2099 — boxes</span><input class="count-input" data-count="c7" type="number" inputmode="numeric" placeholder="—"></div>
+  </div>
+  <div class="count-card">
+    <h3>Barwork & other store totes on lorry</h3>
+    <div class="count-row"><span>Norwich — bar totes</span><input class="count-input" data-count="c8" type="number" inputmode="numeric" placeholder="—"></div>
+    <div class="count-row"><span>Cribbs — gondola bar totes</span><input class="count-input" data-count="c9" type="number" inputmode="numeric" placeholder="—"></div>
+    <div class="count-row"><span>Derby 2273 — shoe prongs</span><input class="count-input" data-count="c10" type="number" inputmode="numeric" placeholder="—"></div>
+    <div class="count-row"><span>Archiving boxes → Hemel</span><input class="count-input" data-count="c11" type="number" inputmode="numeric" placeholder="—"></div>
+  </div>
+
+  <div class="item" data-id="c-msg" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Message Chris with all counts once lorry loaded</strong></div>
+  </div>
+  <div class="item" data-id="c-photo1" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Photos: BOH + shopfloor → Chris in Teams</strong></div>
+  </div>
+  <div class="item" data-id="c-photo2" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Photos: kit movement items → Chris in Teams</strong></div>
+  </div>
+</div>
+
+<!-- ========== KIT ========== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background:var(--green)">2</div>
+    <h2>Kit movement</h2>
+    <span class="time">While stock packs</span>
+  </div>
+
+  <div class="item" data-id="k1" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Kit for Reading / Watford / High Wycombe / Brighton</strong><span class="item-sub">A4 labels on every piece. Group in 915 area. Stays in store — UCD collects Tue.</span></div>
+  </div>
+  <div class="item" data-id="k2" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>White gondola → Brighton</strong><span class="item-sub">A4 label. With the other kit movement items.</span></div>
+  </div>
+  <div class="item" data-id="k3" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Disabled bench → label "BACK TO UCD"</strong><span class="item-sub">Fitting room bench with support handles.</span></div>
+  </div>
+  <div class="item" data-id="k4" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>4-ways: cable tie arms</strong><span class="item-sub">4 arms per unit (2 styles), hook over middle, tie top + bottom.</span></div>
+  </div>
+  <div class="item" data-id="k5" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Leftover kit → block in FW area, photo for Chris</strong></div>
+  </div>
+</div>
+
+<!-- ========== LORRY ========== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background:var(--slate)">3</div>
+    <h2>Lorry loading order</h2>
+    <span class="time">Lorry at 4pm</span>
+  </div>
+  <div class="alert blue">Stock first. Then everything else in this order.</div>
+
+  <ol class="load-order">
+    <li><strong>All stock</strong> (DC + stores + Croydon) <span class="dest">Priority</span></li>
+    <li><strong>Barwork totes</strong> — Norwich, Cribbs, Derby <span class="dest">S2S labels</span></li>
+    <li><strong>Black sale rails</strong> — cable-tied <span class="dest">→ MK new store</span></li>
+    <li><strong>Returns kiosk</strong> <span class="dest">→ DC, FAO Alex, Mez</span></li>
+    <li><strong>Black party rails</strong> — dismantled <span class="dest">→ DC MEZ, FAO Grace</span></li>
+    <li><strong>Clip frames</strong> — bubble-wrapped <span class="dest">→ DC1 MEZ</span></li>
+    <li><strong>POS holders</strong> — to stores or <span class="dest">→ DC1 MEZ, FAO Alex</span></li>
+    <li><strong>Archiving + stationery</strong> <span class="dest">→ Hemel Hempstead</span></li>
+    <li><strong>Teal + red sale POS</strong> <span class="dest">→ Stores or Hemel</span></li>
+    <li><strong>Rails with wheels + dollies</strong> <span class="dest">→ DC</span></li>
+    <li><strong>Confidential waste</strong> <span class="dest">→ DC</span></li>
+    <li><strong>Security tags</strong> — half-filled totes <span class="dest">→ DC</span></li>
+    <li><strong>Hangers</strong> — sealed (tops labelled) <span class="dest">→ DC</span></li>
+    <li><strong>C&C cages</strong> <span class="dest">→ DC</span></li>
+    <li><strong>Empty totes</strong> (keep 6 back!) <span class="dest">→ DC</span></li>
+    <li><strong>Unused cardboard boxes</strong> <span class="dest">→ DC</span></li>
+  </ol>
+
+  <div class="item" data-id="l1" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>6 empty totes kept aside for IT on Sunday</strong></div>
+  </div>
+  <div class="alert red">No POS, stationery, equipment or mannequins to DC unless agreed with IM.</div>
+</div>
+
+<!-- ========== WRAP-UP ========== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background:var(--blue)">4</div>
+    <h2>Store wrap-up</h2>
+    <span class="time">Before you leave</span>
+  </div>
+
+  <div class="item" data-id="w1" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>"That's a wrap" poster in main window</strong></div>
+  </div>
+  <div class="item" data-id="w2" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>All windows empty — mannequins stripped</strong></div>
+  </div>
+  <div class="item" data-id="w3" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>H&S noticeboard stripped</strong></div>
+  </div>
+  <div class="item" data-id="w4" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Safes empty — key taped inside / code written on</strong></div>
+  </div>
+  <div class="item" data-id="w5" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Locker keys Sellotaped to fronts</strong></div>
+  </div>
+  <div class="item" data-id="w6" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Door codes left accessible for contractors</strong></div>
+  </div>
+  <div class="item" data-id="w7" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>IT Box 1 & 4 prepped</strong><span class="item-sub">Bubble-wrapped, unsealed, 2x Box 1 labels. Ready for Sunday.</span></div>
+  </div>
+  <div class="item" data-id="w8" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Evac pack → labelled Hemel Hempstead</strong></div>
+  </div>
+  <div class="item" data-id="w9" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Lone workers + opening times + radio</strong><span class="item-sub">Take to Sutton/Staines. Tell Chris which store.</span></div>
+  </div>
+  <div class="item" data-id="w10" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Leftover bounce backs → confidential waste</strong></div>
+  </div>
+  <div class="item" data-id="w11" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Ops & maintenance folders set aside for handover</strong></div>
+  </div>
+  <div class="item" data-id="w12" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Photos of every room → Chris for sign-off</strong></div>
+  </div>
+</div>
+
+<!-- ========== SUNDAY ========== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background:var(--muted)">☀</div>
+    <h2>Sunday 26th</h2>
+    <span class="time">8-9am, ~4 hrs</span>
+  </div>
+  <div class="alert green">You + 1. Meet contractor, walk them around, hand over keys.</div>
+
+  <div class="item" data-id="sun1" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Walk contractor around entire store</strong><span class="item-sub">Every room, fire exits, loading bays, access.</span></div>
+  </div>
+  <div class="item" data-id="sun2" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Hand IT Box 1 & 4 to Retail Response</strong><span class="item-sub">Don't seal — they photograph contents.</span></div>
+  </div>
+  <div class="item" data-id="sun3" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Show UCD the kit movement items</strong></div>
+  </div>
+  <div class="item" data-id="sun4" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Final confirm: all stock, cash & confidential info OUT</strong></div>
+  </div>
+  <div class="item" data-id="sun5" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Hand over keys</strong></div>
+  </div>
+  <div class="item" data-id="sun6" onclick="toggle(this)">
+    <div class="checkbox"><svg class="check-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+    <div class="item-text"><strong>Clear Dayforce exceptions at nearest store</strong></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const STORAGE_KEY = 'hounslow2154_checklist';
+
+// Load saved state
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    // Restore checkboxes
+    document.querySelectorAll('.item[data-id]').forEach(el => {
+      if (saved.checks && saved.checks[el.dataset.id]) {
+        el.classList.add('checked');
+      }
+    });
+    // Restore counts
+    document.querySelectorAll('.count-input[data-count]').forEach(el => {
+      if (saved.counts && saved.counts[el.dataset.count] !== undefined) {
+        el.value = saved.counts[el.dataset.count];
+      }
+    });
+  } catch(e) { /* ignore */ }
+}
+
+// Save state
+function saveState() {
+  const state = { checks: {}, counts: {} };
+  document.querySelectorAll('.item[data-id]').forEach(el => {
+    state.checks[el.dataset.id] = el.classList.contains('checked');
+  });
+  document.querySelectorAll('.count-input[data-count]').forEach(el => {
+    if (el.value !== '') state.counts[el.dataset.count] = el.value;
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function toggle(el) {
+  el.classList.toggle('checked');
+  saveState();
+  updateProgress();
+}
+
+function updateProgress() {
+  const items = document.querySelectorAll('.item[data-id]');
+  const checked = document.querySelectorAll('.item[data-id].checked');
+  const pct = items.length ? Math.round((checked.length / items.length) * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = checked.length + ' / ' + items.length + ' done';
+}
+
+function resetAll() {
+  if (!confirm('Reset all checkboxes and counts?')) return;
+  document.querySelectorAll('.item[data-id]').forEach(el => el.classList.remove('checked'));
+  document.querySelectorAll('.count-input').forEach(el => el.value = '');
+  localStorage.removeItem(STORAGE_KEY);
+  updateProgress();
+}
+
+// Save counts on change
+document.querySelectorAll('.count-input').forEach(el => {
+  el.addEventListener('input', saveState);
+});
+
+// Init
+loadState();
+updateProgress();
+</script>
+
+</body>
+</html>
